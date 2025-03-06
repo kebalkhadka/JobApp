@@ -25,7 +25,11 @@ const Navbar = () => {
           {!user ? (
             <div className="flex items-center gap-4 px-8">
               <Link to="/login">
-                <Button variant="outline" onClick={() => setUser(true)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setUser(true)}
+                  className="px-8 py-4"
+                >
                   Login
                 </Button>
               </Link>
@@ -33,7 +37,7 @@ const Navbar = () => {
                 <Button
                   variant="secondary"
                   onClick={() => setUser(true)}
-                  className="bg-purple-600  text-white hover:bg-purple-700"
+                  className="bg-red-700  text-white hover:bg-black px-8 py-4"
                 >
                   Signup
                 </Button>
