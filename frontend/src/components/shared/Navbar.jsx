@@ -1,13 +1,16 @@
 import React from "react";
-
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
-import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+import { setUser } from "../../../redux/slices/authSlice";
+
 const Navbar = () => {
-  const [user, setUser] = useState(false);
+  const { user } = useSelector((store) => store.auth);
+  // const [user, setUser] = useState(false);
   return (
     <div className="bg-white">
       <div className="flex justify-between items-center p-4 md:px-20 ">
@@ -18,9 +21,15 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-4">
           <ul className="flex gap-4 font-semibold items-center ">
-            <li>Home</li>
-            <li>Jobs</li>
-            <li>Browse</li>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/jobs">Jobs</Link>
+            </li>
+            <li>
+              <Link to="/Browse">Browse</Link>
+            </li>
           </ul>
           {!user ? (
             <div className="flex items-center gap-4 px-8">
