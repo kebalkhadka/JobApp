@@ -10,35 +10,32 @@ const LatestJobCards = ({ job }) => {
       className="p-5 rounded-md shadow-xl bg-white border-gray-100 cursor-pointer"
     >
       <div>
-        <h1 className="font-medium text-lg">
-          {job?.company?.name}
-          Company Name
-        </h1>
+        <h1 className=" text-2xl font-bold">{job?.company?.name}</h1>
         <p className="text-sm text-gray-500">Nepal</p>
       </div>
       <div>
-        <h1 className="font-bold text-lg my-2">
-          {/* {job?.title} */}
-          Job Title
-        </h1>
-        <p className="text-sm text-gray-600">
-          {/* {job?.description} */}
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-        </p>
+        <h1 className="font-bold text-2xl my-2">{job?.title}</h1>
+        <p className="text-sm text-gray-600">Description:{job?.description}</p>
       </div>
       <div className="flex items-center gap-2 mt-4">
-        <Badge className={"text-blue-700 font-bold"} variant="ghost">
-          {/* {job?.position} 12Positions */}
-          12 Positions
-        </Badge>
-        <Badge className={"text-red-700 font-bold"} variant="ghost">
-          {/* {job?.jobType} */}
-          Full Time
-        </Badge>
-        <Badge className={"text-purple-600 font-bold"} variant="ghost">
-          {/* {job?.salary}LPA */}
-          30000
-        </Badge>
+        <div className="flex gap-2">
+          <p>No of position</p>
+          <Badge className={"text-blue-700 font-bold"} variant="ghost">
+            {job?.position}
+          </Badge>
+        </div>
+        <div className="flex gap-2">
+          <p>Job Status</p>
+          <Badge className={"text-red-700 font-bold"} variant="ghost">
+            {job?.jobType}
+          </Badge>
+        </div>
+        <div className="flex gap-2">
+          <p>Salary</p>
+          <Badge className={"text-purple-600 font-bold"} variant="ghost">
+            {job?.salary}
+          </Badge>
+        </div>
       </div>
     </div>
   );

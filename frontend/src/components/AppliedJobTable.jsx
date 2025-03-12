@@ -22,12 +22,16 @@ const AppliedJobTable = () => {
             <TableHead>Date</TableHead>
             <TableHead>Job Role</TableHead>
             <TableHead>Company</TableHead>
-            <TableHead classname="text-right">Status</TableHead>
+            <TableHead className="text-right">Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {allAppliedJobs.length <= 0 ? (
-            <span>You haven't applied any job yet</span>
+            <TableRow>
+              <TableCell colSpan={4}>
+                You haven't applied to any jobs yet
+              </TableCell>
+            </TableRow>
           ) : (
             allAppliedJobs.map((appliedJob) => (
               <TableRow key={appliedJob?._id}>

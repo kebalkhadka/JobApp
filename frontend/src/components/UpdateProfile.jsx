@@ -13,10 +13,11 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { USER_API_END_POINT } from "../../utlis/constants";
+import { toast } from "sonner";
+import { setUser } from "../../redux/slices/authSlice";
+import axios from "axios";
 
-const submitHandler = (e) => {
-  e.preventDefault();
-};
 const UpdateProfile = ({ open, setOpen }) => {
   const { user } = useSelector((store) => store.auth);
   const [loading, setLoading] = useState(false);
@@ -34,6 +35,43 @@ const UpdateProfile = ({ open, setOpen }) => {
   const fileChangeHandler = (e) => {
     const file = e.target.files?.[0];
     setInput({ ...input, file });
+  };
+  const dispatch = useDispatch();
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("fullName", input.fullName);
+    formData.append("email", input.email);
+    formData.append("phoneNumber", input.phoneNumber);
+    formData.append("bio", input.bio);
+    formData.append("skills", input.skills);
+    if (input.file) {
+      formData.append("file", input.file);
+    }
+    try {
+      setLoading(true);
+      const res = await axios.post(
+        `${USER_API_END_POINT}/profile/update`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
+      );
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
+    } finally {
+      setLoading(false);
+    }
+    setOpen(false);
+    console.log(input);
   };
   return (
     <div>

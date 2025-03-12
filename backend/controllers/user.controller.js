@@ -1,54 +1,48 @@
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-// import getDataUri from "../utils/datauri.js";
-// import cloudinary from "../utils/cloudinary.js";
+import cloudinary from "../utils/cloudinary.js";
+import getDataUri from "../utils/datauri.js";
 
 export const register = async (req, res) => {
   try {
-    // Log the form data and uploaded file
-    console.log("Form Data:", req.body);
-    console.log("Uploaded File:", req.file);
-
     const { fullName, email, phoneNumber, password, role } = req.body;
+    console.log(fullName, email, phoneNumber, password, role)
 
-    if (!fullName || !email || !phoneNumber || !role || !password) {
+    if (!fullName || !email || !phoneNumber || !role) {
       return res.status(400).json({
         message: "something is missing",
         success: false,
       });
     }
-
+    const file = req.file;
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
-        message: "User already exists with the email",
-        status: false,
+        message: "User already exist with the email",
       });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Save the user (you can also handle file upload here if needed)
     await User.create({
       fullName,
       email,
       phoneNumber,
       password: hashedPassword,
       role,
-      // Optionally, save the file path or process it (e.g., upload to cloud)
+      profile: {
+       
+        profilePhoto: cloudResponse.secure_url,
+      },
     });
-
     return res.status(201).json({
-      message: "Account created successfully.",
+      message: "Account creted successfully.",
       success: true,
     });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({
-      message: "Server error",
-      success: false,
-    });
   }
 };
 
@@ -129,11 +123,13 @@ export const updateProfile = async (req, res) => {
   try {
     const { fullName, email, phoneNumber, bio, skills } = req.body;
 
-    // const file = req.file;
+    const file = req.file;
+    console.log("Received file:", req.file);
+
     // //cloudinary aaucha yeta
 
-    // const fileUri = getDataUri(file);
-    // const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
     let skillsArray;
     if (skills) {
@@ -159,10 +155,10 @@ export const updateProfile = async (req, res) => {
 
     //resume comes later here...
 
-    // if (cloudResponse) {
-    //   user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
-    //   user.profile.resumeOriginalName = file.originalname; //save the original file name
-    // }
+    if (cloudResponse) {
+      user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
+      user.profile.resumeOriginalName = file.originalname; //save the original file name
+    }
     await user.save();
     user = {
       _id: user._id,

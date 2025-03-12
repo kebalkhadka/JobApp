@@ -3,14 +3,36 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "../../../redux/slices/authSlice";
+import { toast } from "sonner";
+import axios from "axios";
+import { USER_API_END_POINT } from "../../../utlis/constants";
 
 const Navbar = () => {
   const { user } = useSelector((store) => store.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   // const [user, setUser] = useState(false);
+  const logouthandler = async () => {
+    try {
+      const res = await axios.post(`${USER_API_END_POINT}logout`, {
+        withCredentials: true,
+      });
+      if (res.data.success) {
+        dispatch(setUser(null));
+        navigate("/");
+        console.log(user?.profile?.profilePhoto);
+
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
   return (
     <div className="bg-white">
       <div className="flex justify-between items-center p-4 md:px-20 ">
@@ -20,67 +42,74 @@ const Navbar = () => {
           </h1>
         </div>
         <div className="flex items-center gap-4">
-          <ul className="flex gap-4 font-semibold items-center ">
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/jobs">Jobs</Link>
-            </li>
-            <li>
-              <Link to="/Browse">Browse</Link>
-            </li>
+          <ul className="flex font-medium items-center gap-5">
+            {user && user.role === "recruiter" ? (
+              <>
+                <li>
+                  <Link to="/admin/companies">Companies</Link>
+                </li>
+                <li>
+                  <Link to="/admin/jobs">Jobs</Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link to="/">Home</Link>
+                </li>
+                <li>
+                  <Link to="/jobs">Jobs</Link>
+                </li>
+                <li>
+                  <Link to="/Browse">Browse</Link>
+                </li>
+              </>
+            )}
           </ul>
           {!user ? (
-            <div className="flex items-center gap-4 px-8">
+            <div className="flex itmes-center gap-2">
               <Link to="/login">
-                <Button
-                  variant="outline"
-                  onClick={() => setUser(true)}
-                  className="px-8 py-4"
-                >
-                  Login
-                </Button>
+                {" "}
+                <Button variant="outline">Login</Button>
               </Link>
               <Link to="/signup">
-                <Button
-                  variant="secondary"
-                  onClick={() => setUser(true)}
-                  className="bg-red-700  text-white hover:bg-black px-8 py-4"
-                >
-                  Signup
-                </Button>
+                <Button className="bg-red-600 hover:bg-red-700">Signup</Button>
               </Link>
             </div>
           ) : (
             <Popover>
-              <PopoverTrigger>
-                <Avatar className={"cursor-pointer"}>
-                  <AvatarImage src="https://github.com/shadcn.png" />
+              <PopoverTrigger asChild>
+                <Avatar className="cursor-pointer">
+                  <AvatarImage src={user?.profile?.profilePhoto} />
                 </Avatar>
               </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="flex gap-4">
-                  <Avatar className={"cursor-pointer"}>
-                    <AvatarImage src="https://github.com/shadcn.png" />
+              <PopoverContent className="w-88">
+                <div className="flex gap-2 spae-y-2">
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.profile?.profilePhoto} />
                   </Avatar>
                   <div>
-                    <h3 className="font-medium">Kebal Khadka</h3>
+                    <h4 className="font-medium">{user?.fullName}</h4>
                     <p className="text-sm text-muted-foreground">
-                      Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                      Quasi dolores delectus voluptatibus quo mollitia
-                      aspernatur{" "}
+                      {user?.profile?.bio}
                     </p>
                   </div>
                 </div>
-                <div flex flex-col text-gray-600>
-                  <div className="flex w-fit items-center cursor-pointer">
-                    <User2 />
-                    <Button variant="link">View Profile</Button>
-                  </div>
-                  <div className="flex w-fit items-center cursor-pointer">
+                <div className="flex flex-col text-gray-600">
+                  {user && user.role === "jobseeker" && (
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                      <User2 />
+                      <Button variant="link">
+                        <Link to="/profile">View Profile</Link>
+                      </Button>
+                    </div>
+                  )}
+
+                  <div className="flex w-fit items-center gap-2 cursor-pointer">
                     <LogOut />
-                    <Button variant="link">Logout</Button>
+                    <Button onClick={logouthandler} variant="link">
+                      Logout
+                    </Button>
                   </div>
                 </div>
               </PopoverContent>

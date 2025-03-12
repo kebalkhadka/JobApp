@@ -1,93 +1,93 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "./shared/Navbar";
 import { Avatar, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Contact, Mail, Pen } from "lucide-react";
 import { Badge } from "./ui/badge";
 import { Label } from "./ui/label";
-import AppliedJobTable from "./AppliedJobTable";
-import { useState } from "react";
 import UpdateProfile from "./UpdateProfile";
+import { useSelector } from "react-redux";
 
-const skills = ["React", "Node", "Express", "MongoDB", "Firebase"];
+import AppliedJobTable from "./AppliedJobTable";
+import useGetAppliedJobs from "./hooks/useGetAppliedJobs";
+
+// const skills = ["HTML", "CSS", "JAVASCRIPT", "REACTJS"];
 const isResume = true;
-
 const Profile = () => {
+  useGetAppliedJobs();
   const [open, setOpen] = useState(false);
-  const isResume = true;
+  const { user } = useSelector((store) => store.auth);
+  console.log("Resume URL:", user?.profile?.resume);
+  console.log("Resume Name:", user?.profile?.resumeOriginalName);
+
   return (
     <div>
       <Navbar />
-      <div className="p-4 md:px-20">
-        <div className="border-2 bg-white rounded-xl border-gray-200 p-4">
-          <div className="flex justify-center">
-            <div className="flex items-center gap-4">
-              <Avatar className={"w-32 h-32"}>
-                <AvatarImage src="https://th.bing.com/th/id/OIP.HJaK9nBzi4aXrIm5tSf_jwHaHa?rs=1&pid=ImgDetMain" />
-              </Avatar>
-              <div>
-                <h1 className="font-medium text-xl ">Full Name</h1>
-                <p>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Voluptates explicabo soluta illum officiis, fugiat sint
-                  quibusdam est debitis eligendi aut dignissimos praesentium
-                  deleniti ea eaque ad, modi repellat rem dicta.
-                </p>
-              </div>
-              <Button
-                className="text-right"
-                variant="outline"
-                onClick={() => setOpen(true)}
-              >
-                <Pen />
-              </Button>
+      <div className="flex justify-between  p-4 md:px-20 flex-col bg-white rounded-2xl my-5">
+        <div className="flex justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-24 w-24">
+              <AvatarImage
+                src={
+                  user?.profile?.profilePhoto ||
+                  "https://via.placeholder.com/150"
+                }
+              />
+            </Avatar>
+            <div>
+              <h1 className="font-medium text-xl">{user?.fullName}</h1>
+              <p>{user?.profile?.bio}</p>
             </div>
+            <Button
+              onClick={() => setOpen(true)}
+              className="text-right"
+              variant="outline"
+            >
+              <Pen />
+            </Button>
           </div>
-          <div className="my-5">
-            <div className="flex items-center gap-4 my-2">
-              <Mail />
-              <span>Kebalkhadka123@gmail.com</span>
-            </div>
-            <div className="flex items-center gap-4 my-2">
-              <Contact />
-              <span>14578</span>
-            </div>
+        </div>
+        <div className="my-5">
+          <div className="flex items-center gap-3 my-2">
+            <Mail />
+            <span>{user?.email}</span>
           </div>
-          <div className="my-5">
-            <h1>Skills</h1>
-            <div className="flex items-center gap-1">
-              {skills.length !== 0 ? (
-                skills.map((item, index) => {
-                  return (
-                    <Badge key={index} className="mt-2">
-                      {item}
-                    </Badge>
-                  );
-                })
-              ) : (
-                <p>No skills added</p>
-              )}
-            </div>
+          <div className="flex items-center gap-3 my-2">
+            <Contact />
+            <span>{user?.phoneNumber}</span>
           </div>
-          <div className="grid w-full items-center max-w-sm gap-1.5">
-            <Label className="text-md font-semibold">Resume</Label>
-            {isResume ? (
-              <a
-                href="https://i.pinimg.com/originals/dd/7d/f4/dd7df4cfc15d7a615ee112596477761f.jpg"
-                target="_blank"
-                className="text-blue-500"
-              >
-                Resume
-              </a>
+        </div>
+        <div className="my-5">
+          <h1>Skills</h1>
+          <div className="flex items-center gap-1">
+            {Array.isArray(user?.profile?.skills) &&
+            user?.profile?.skills.length > 0 ? (
+              user?.profile?.skills.map((item, index) => (
+                <p key={index}>{item}</p>
+              ))
             ) : (
-              <span>No resume added</span>
+              <span>NA</span>
             )}
           </div>
         </div>
-        <div className="mt-5">
-          <h1 className="font-bold text-lg my-5 ">Applied Jobs</h1>
-          <AppliedJobTable />
+        <div className="grid w-full max-w-sm items-center gap-1.5">
+          <Label className="text-md font-bold">Resume</Label>
+          {isResume ? (
+            <a
+              target="blank"
+              href={user?.profile?.resume}
+              className="text-blue-500 w-full hover:underline cursor-pointer"
+            >
+              {user?.profile?.resumeOriginalName}
+            </a>
+          ) : (
+            <span>NA</span>
+          )}
         </div>
+      </div>
+      <div className="flex justify-between  p-4 md:px-20 flex-col mx-auto bg-white rounded-2xl">
+        <h1 className="font-bold text-lg my-5">Applied Jobs </h1>
+        <AppliedJobTable />
       </div>
       <UpdateProfile open={open} setOpen={setOpen} />
     </div>
